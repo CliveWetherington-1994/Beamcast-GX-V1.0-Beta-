@@ -1,0 +1,20 @@
+#version 450
+// Beamcast GX Vulkan compute queue compaction reference. Dispatch scan with 256 threads.
+layout(local_size_x=256) in;
+layout(set=0,binding=0,std430) readonly buffer Flags { uint flags[]; };
+layout(set=0,binding=1,std430) writeonly buffer Prefix { uint prefix[]; };
+layout(set=0,binding=2,std430) writeonly buffer BlockSums { uint block_sums[]; };
+layout(push_constant) uniform Params { uint count; } pc;
+shared uint temp[256];
+void main(){
+    uint lid=gl_LocalInvocationID.x, gid=gl_GlobalInvocationID.x;
+    temp[lid]=(gid<pc.count && flags[gid]!=0u)?1u:0u;
+    barrier();
+    for(uint offset=1u;offset<256u;offset<<=1u){
+        uint v=lid>=offset?temp[lid-offset]:0u;
+        barrier(); uint cur=temp[lid]; barrier(); temp[lid]=cur+v; barrier();
+    }
+    uint inclusive=temp[lid];
+    if(gid<pc.count) prefix[gid]=inclusive-(flags[gid]!=0u?1u:0u);
+    if(lid==255u) block_sums[gl_WorkGroupID.x]=inclusive;
+}

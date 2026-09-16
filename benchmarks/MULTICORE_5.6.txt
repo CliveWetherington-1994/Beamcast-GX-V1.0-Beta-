@@ -1,0 +1,71 @@
+BEAMCAST GX 5.6 MULTICORE HYPERSCALE BENCHMARK REPORT
+=====================================================
+
+Environment
+-----------
+Reported CPU: AMD EPYC 9V74 80-Core Processor
+Container CPU quota: 4 CPU equivalents
+Effective cpuset: 0-4
+Go runtime benchmark host: linux/amd64
+
+Scaling workload
+----------------
+480 x 270
+6 spp
+6 bounces
+Path tracing
+MIS enabled
+Power-weighted emissive-light sampling enabled
+Random sampler
+CPU backend
+No denoise / AO / bloom / AA post
+Progressive updates disabled
+Adaptive sampling disabled
+
+Median results across 3 repeated benchmark groups:
+
+Workers    5.5 GPU HyperCore    5.6 HyperScale    Time reduction
+1          397.940 ms            387.010 ms         2.75%
+2          228.452 ms            197.551 ms        13.53%
+4          135.781 ms            106.106 ms        21.85%
+
+4-worker speedup vs 1-worker:
+5.5: 2.93x
+5.6: 3.65x
+
+4-worker parallel efficiency:
+5.5: 73.3%
+5.6: 91.2%
+
+Post-heavy workload
+-------------------
+640 x 360
+2 spp
+4 bounces
+4 workers
+Path tracing
+Guide-aware denoise
+HBAO+ level 2
+Bloom level 2
+FXAA level 2
+TXAA-style resolve level 1
+
+5.5 median: 520.401 ms
+5.6 median: 238.477 ms
+Time reduction: 54.17%
+Throughput: 2.18x
+
+Primary reasons
+---------------
+- removed shared per-ray atomic telemetry increment
+- per-worker local ray counts with coarse merging
+- dynamic one-tile scheduling for path-cost load balance
+- fewer atomic cancellation/generation checks
+- parallel final tone map / framebuffer conversion
+- no temporal-history copies unless temporal reconstruction is enabled
+- post effects parallelized across available cores
+- storage reuse for history/guide buffers
+
+Scope
+-----
+These are local measurements for the listed workloads and environment. They do not imply identical scaling on every CPU, OS, scene, or memory configuration.

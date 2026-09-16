@@ -1,0 +1,76 @@
+BEAMCAST GX 5.3 HYPEROPTIMIZATION BENCHMARK SNAPSHOT
+=====================================================
+Environment: Linux amd64, Intel Xeon Platinum 8370C @ 2.80 GHz
+Date: 2026-09-15
+
+These are local development measurements, not universal performance guarantees.
+
+1) Stress-scene BVH traversal, 2048 deterministic rays
+-------------------------------------------------------
+5.2 baseline:
+  2.308310 ms/op
+  2.236430 ms/op
+  2.208452 ms/op
+  median: 2.236430 ms/op
+
+5.3 SAH16 + fast traversal:
+  0.783004 ms/op
+  0.810168 ms/op
+  0.835045 ms/op
+  median: 0.810168 ms/op
+
+Median speedup: 2.76x
+Allocations: 0 B/op, 0 allocs/op
+
+2) End-to-end tiny stress render
+--------------------------------
+Settings: 256x144, CPU, 2 spp, 3 bounces, denoise enabled,
+TAA/TSAA/TXAA/HBAO/bloom disabled, three renders per benchmark op.
+
+5.2:
+  173.871692 ms/op
+  140.863047 ms/op
+  174.170164 ms/op
+  median: 173.871692 ms/op
+
+5.3:
+  80.076029 ms/op
+  81.246942 ms/op
+  77.898706 ms/op
+  median: 80.076029 ms/op
+
+Median speedup: 2.17x
+
+3) Interactive BVH update
+-------------------------
+5.3 full SAH16 rebuild:
+  2.089556 ms/op
+  2.521325 ms/op
+  2.378642 ms/op
+  median: 2.378642 ms/op
+
+5.3 refit:
+  0.091236 ms/op
+  0.113501 ms/op
+  0.179316 ms/op
+  median: 0.113501 ms/op
+
+Median transform-update improvement from refit: ~20.96x
+Allocations in benchmarked refit path: 0 B/op, 0 allocs/op
+
+4) Halton 64-sample jitter loop
+--------------------------------
+Legacy per-sample computation:
+  5.026 us/op
+  3.827 us/op
+  4.113 us/op
+  median: 4.113 us/op
+
+Prepared render sequence + per-pixel rotation:
+  0.09233 us/op
+  0.09962 us/op
+  0.09802 us/op
+  median: 0.09802 us/op
+
+Median sampler-overhead reduction: ~41.96x
+Allocations: 0 B/op, 0 allocs/op

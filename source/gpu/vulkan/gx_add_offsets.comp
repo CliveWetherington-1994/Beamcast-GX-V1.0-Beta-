@@ -1,0 +1,6 @@
+#version 450
+layout(local_size_x=256) in;
+layout(set=0,binding=0,std430) buffer Prefix { uint prefix[]; };
+layout(set=0,binding=1,std430) readonly buffer BlockOffsets { uint block_offsets[]; };
+layout(push_constant) uniform Params { uint count; } pc;
+void main(){uint gid=gl_GlobalInvocationID.x;if(gid>=pc.count)return;uint group=gid/256u;if(group>0u)prefix[gid]+=block_offsets[group];}

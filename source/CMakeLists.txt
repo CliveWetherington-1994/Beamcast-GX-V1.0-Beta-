@@ -1,0 +1,232 @@
+cmake_minimum_required(VERSION 3.16)
+project(beamcast VERSION 5.9.0 LANGUAGES CXX)
+
+option(BEAMCAST_BUILD_EXAMPLES "Build Beamcast examples" OFF)
+option(BEAMCAST_BUILD_STUDIO "Build the Beamcast Studio desktop application" ON)
+option(BEAMCAST_BUILD_CLI "Build the Beamcast command-line renderer" ON)
+option(BEAMCAST_BUILD_TESTS "Build Beamcast tests" OFF)
+option(BEAMCAST_BUILD_OPENGL_PREVIEW "Build GLFW/OpenGL CPU framebuffer preview when dependencies exist" OFF)
+option(BEAMCAST_ENABLE_SIMD "Use SSE2 vector operations where available" ON)
+option(BEAMCAST_HX_ENABLE_AVX2 "Compile Beamcast HX with AVX2/FMA where supported" OFF)
+option(BEAMCAST_HX_NATIVE "Tune Beamcast HX for the current host CPU" OFF)
+
+option(BEAMCAST_BUILD_NATIVE_GPU_KERNELS "Build optional Vulkan/CUDA/HIP kernel specializations when toolchains exist" OFF)
+
+add_library(beamcast
+    src/bvh.cpp
+    src/easy.cpp
+    src/hx.cpp
+    src/gx.cpp
+    src/gx_stream.cpp
+    src/gx_research.cpp
+    src/material.cpp
+    src/mesh.cpp
+    src/renderer.cpp
+    src/texture.cpp
+    src/uniform_grid.cpp
+    src/world.cpp
+)
+add_library(beamcast::beamcast ALIAS beamcast)
+find_package(Threads REQUIRED)
+target_link_libraries(beamcast PUBLIC Threads::Threads ${CMAKE_DL_LIBS})
+target_include_directories(beamcast PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
+target_compile_features(beamcast PUBLIC cxx_std_17)
+if(NOT BEAMCAST_ENABLE_SIMD)
+    target_compile_definitions(beamcast PUBLIC BEAMCAST_DISABLE_SIMD=1)
+endif()
+if(MSVC)
+    target_compile_options(beamcast PRIVATE /W4 /permissive-)
+    if(BEAMCAST_HX_ENABLE_AVX2)
+        target_compile_options(beamcast PRIVATE /arch:AVX2)
+    endif()
+else()
+    target_compile_options(beamcast PRIVATE -Wall -Wextra -Wpedantic)
+    if(BEAMCAST_HX_ENABLE_AVX2)
+        target_compile_options(beamcast PRIVATE -mavx2 -mfma)
+    endif()
+    if(BEAMCAST_HX_NATIVE)
+        target_compile_options(beamcast PRIVATE -march=native -mtune=native)
+    endif()
+endif()
+
+if(BEAMCAST_BUILD_NATIVE_GPU_KERNELS)
+    find_program(BEAMCAST_GLSLC glslc)
+    if(BEAMCAST_GLSLC)
+        set(BEAMCAST_VK_SHADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/gpu/vulkan)
+        file(MAKE_DIRECTORY ${BEAMCAST_VK_SHADER_DIR})
+        foreach(shader gx_compact gx_scatter gx_add_offsets)
+            add_custom_command(
+                OUTPUT ${BEAMCAST_VK_SHADER_DIR}/${shader}.spv
+                COMMAND ${BEAMCAST_GLSLC} ${CMAKE_CURRENT_SOURCE_DIR}/gpu/vulkan/${shader}.comp -o ${BEAMCAST_VK_SHADER_DIR}/${shader}.spv
+                DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gpu/vulkan/${shader}.comp
+                VERBATIM)
+            list(APPEND BEAMCAST_VK_SPV ${BEAMCAST_VK_SHADER_DIR}/${shader}.spv)
+        endforeach()
+        add_custom_target(beamcast_vulkan_shaders ALL DEPENDS ${BEAMCAST_VK_SPV})
+        target_compile_definitions(beamcast PUBLIC BEAMCAST_HAS_VULKAN_BACKEND=1)
+        message(STATUS "Beamcast Vulkan compute shaders enabled")
+    else()
+        message(STATUS "Beamcast Vulkan shader build skipped (glslc not found); GLSL sources are still installed")
+    endif()
+
+    include(CheckLanguage)
+    check_language(CUDA)
+    if(CMAKE_CUDA_COMPILER)
+        enable_language(CUDA)
+        add_library(beamcast_gx_cuda OBJECT gpu/cuda/beamcast_gx.cu)
+        set_target_properties(beamcast_gx_cuda PROPERTIES CUDA_STANDARD 17 CUDA_STANDARD_REQUIRED ON POSITION_INDEPENDENT_CODE ON)
+        target_compile_definitions(beamcast PUBLIC BEAMCAST_HAS_CUDA_BACKEND=1)
+        message(STATUS "Beamcast CUDA specialization enabled")
+    else()
+        message(STATUS "Beamcast CUDA specialization skipped (nvcc not found)")
+    endif()
+
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
+        check_language(HIP)
+        if(CMAKE_HIP_COMPILER)
+            enable_language(HIP)
+            add_library(beamcast_gx_hip OBJECT gpu/hip/beamcast_gx_hip.cpp)
+            set_source_files_properties(gpu/hip/beamcast_gx_hip.cpp PROPERTIES LANGUAGE HIP)
+            set_target_properties(beamcast_gx_hip PROPERTIES HIP_STANDARD 17 HIP_STANDARD_REQUIRED ON POSITION_INDEPENDENT_CODE ON)
+            target_compile_definitions(beamcast PUBLIC BEAMCAST_HAS_HIP_BACKEND=1)
+            message(STATUS "Beamcast HIP specialization enabled")
+        else()
+            message(STATUS "Beamcast HIP specialization skipped (hipcc not found)")
+        endif()
+    endif()
+endif()
+
+# Beamcast CLI: a portable executable for batch/headless rendering.
+if(BEAMCAST_BUILD_CLI)
+    add_executable(beamcast_cli app/studio_core.cpp app/beamcast_cli.cpp)
+    target_link_libraries(beamcast_cli PRIVATE beamcast)
+    target_include_directories(beamcast_cli PRIVATE app)
+    target_compile_features(beamcast_cli PRIVATE cxx_std_17)
+    set_target_properties(beamcast_cli PROPERTIES OUTPUT_NAME "beamcast-cli")
+endif()
+
+# Beamcast Studio: a native desktop application layered on top of the library.
+if(BEAMCAST_BUILD_STUDIO)
+    if(WIN32)
+        add_executable(beamcast_studio WIN32 app/studio_core.cpp app/studio_win32.cpp)
+        target_link_libraries(beamcast_studio PRIVATE beamcast comdlg32 gdi32 user32)
+        target_include_directories(beamcast_studio PRIVATE app)
+        target_compile_features(beamcast_studio PRIVATE cxx_std_17)
+        set_target_properties(beamcast_studio PROPERTIES OUTPUT_NAME "BeamcastStudio")
+    elseif(UNIX AND NOT APPLE)
+        find_package(X11 QUIET)
+        if(X11_FOUND)
+            add_executable(beamcast_studio app/studio_core.cpp app/studio_x11.cpp)
+            target_link_libraries(beamcast_studio PRIVATE beamcast X11::X11)
+            target_include_directories(beamcast_studio PRIVATE app)
+            target_compile_features(beamcast_studio PRIVATE cxx_std_17)
+            set_target_properties(beamcast_studio PROPERTIES OUTPUT_NAME "beamcast-studio")
+        else()
+            message(WARNING "Beamcast Studio skipped: X11 development files were not found")
+        endif()
+    else()
+        message(WARNING "Beamcast Studio currently supports native Win32 and X11 frontends")
+    endif()
+endif()
+
+if(BEAMCAST_BUILD_EXAMPLES)
+    add_executable(beamcast_easy_example examples/easy_scene.cpp)
+    target_link_libraries(beamcast_easy_example PRIVATE beamcast)
+    add_executable(beamcast_example examples/basic_scene.cpp)
+    target_link_libraries(beamcast_example PRIVATE beamcast)
+    add_executable(beamcast_benchmark examples/benchmark_accel.cpp)
+    target_link_libraries(beamcast_benchmark PRIVATE beamcast)
+    add_executable(beamcast_hx_example examples/hx_scene.cpp)
+    target_link_libraries(beamcast_hx_example PRIVATE beamcast)
+    add_executable(beamcast_hx_benchmark examples/hx_benchmark.cpp)
+    target_link_libraries(beamcast_hx_benchmark PRIVATE beamcast)
+    add_executable(beamcast_gx_example examples/gx_scene.cpp)
+    target_link_libraries(beamcast_gx_example PRIVATE beamcast)
+    add_executable(beamcast_gx_benchmark examples/gx_benchmark.cpp)
+    target_link_libraries(beamcast_gx_benchmark PRIVATE beamcast)
+    add_executable(beamcast_price_perf examples/price_perf.cpp)
+    target_link_libraries(beamcast_price_perf PRIVATE beamcast)
+    add_executable(beamcast_gx_research_benchmark examples/gx_research_benchmark.cpp)
+    target_link_libraries(beamcast_gx_research_benchmark PRIVATE beamcast)
+endif()
+
+if(BEAMCAST_BUILD_OPENGL_PREVIEW)
+    find_package(OpenGL QUIET)
+    find_package(glfw3 CONFIG QUIET)
+    if(OpenGL_FOUND AND (TARGET glfw OR TARGET glfw3::glfw))
+        add_executable(beamcast_preview examples/preview_glfw.cpp)
+        target_link_libraries(beamcast_preview PRIVATE beamcast OpenGL::GL)
+        if(TARGET glfw)
+            target_link_libraries(beamcast_preview PRIVATE glfw)
+        else()
+            target_link_libraries(beamcast_preview PRIVATE glfw3::glfw)
+        endif()
+        message(STATUS "Beamcast OpenGL preview enabled")
+    else()
+        message(STATUS "Beamcast OpenGL preview skipped (install GLFW + OpenGL dev packages to enable)")
+    endif()
+endif()
+
+if(BEAMCAST_BUILD_TESTS)
+    enable_testing()
+    add_executable(beamcast_smoke tests/smoke.cpp)
+    target_link_libraries(beamcast_smoke PRIVATE beamcast)
+    target_compile_definitions(beamcast_smoke PRIVATE
+        BEAMCAST_TEST_OBJ="${CMAKE_CURRENT_SOURCE_DIR}/examples/assets/pyramid.obj"
+        BEAMCAST_TEST_PPM="${CMAKE_CURRENT_SOURCE_DIR}/tests/assets/test.ppm")
+    add_test(NAME beamcast_smoke COMMAND beamcast_smoke)
+
+    add_executable(beamcast_hx_test tests/hx_test.cpp)
+    target_link_libraries(beamcast_hx_test PRIVATE beamcast)
+    add_test(NAME beamcast_hx_test COMMAND beamcast_hx_test)
+    add_executable(beamcast_gx_test tests/gx_test.cpp)
+    target_link_libraries(beamcast_gx_test PRIVATE beamcast)
+    add_test(NAME beamcast_gx_test COMMAND beamcast_gx_test)
+    add_executable(beamcast_gx_abi_test tests/gx_abi_test.cpp)
+    target_link_libraries(beamcast_gx_abi_test PRIVATE beamcast)
+    add_test(NAME beamcast_gx_abi_test COMMAND beamcast_gx_abi_test)
+    add_executable(beamcast_gx_stream_test tests/gx_stream_test.cpp)
+    target_link_libraries(beamcast_gx_stream_test PRIVATE beamcast)
+    add_test(NAME beamcast_gx_stream_test COMMAND beamcast_gx_stream_test)
+    add_executable(beamcast_gx_research_test tests/gx_research_test.cpp)
+    target_link_libraries(beamcast_gx_research_test PRIVATE beamcast)
+    add_test(NAME beamcast_gx_research_test COMMAND beamcast_gx_research_test)
+    add_executable(beamcast_gx_stress_test tests/gx_stress_test.cpp)
+    target_link_libraries(beamcast_gx_stress_test PRIVATE beamcast)
+    add_test(NAME beamcast_gx_stress_test COMMAND beamcast_gx_stress_test)
+
+    add_executable(beamcast_easy_test tests/easy_test.cpp)
+    target_link_libraries(beamcast_easy_test PRIVATE beamcast)
+    add_test(NAME beamcast_easy_test COMMAND beamcast_easy_test)
+
+    add_executable(beamcast_studio_core_test tests/studio_core_test.cpp app/studio_core.cpp)
+    target_link_libraries(beamcast_studio_core_test PRIVATE beamcast)
+    target_include_directories(beamcast_studio_core_test PRIVATE app)
+    add_test(NAME beamcast_studio_core_test COMMAND beamcast_studio_core_test)
+endif()
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+install(TARGETS beamcast EXPORT beamcastTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+if(TARGET beamcast_studio)
+    install(TARGETS beamcast_studio RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+if(TARGET beamcast_cli)
+    install(TARGETS beamcast_cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT beamcastTargets NAMESPACE beamcast:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/beamcast)
+configure_package_config_file(cmake/beamcastConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/beamcastConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/beamcast)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/beamcastConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/beamcastConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/beamcastConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/beamcast)
+
+install(DIRECTORY gpu/ DESTINATION ${CMAKE_INSTALL_DATADIR}/beamcast/gpu)
+install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_DATADIR}/beamcast/docs)

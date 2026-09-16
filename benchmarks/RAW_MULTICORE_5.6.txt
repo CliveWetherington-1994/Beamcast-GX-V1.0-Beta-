@@ -1,0 +1,18 @@
+goos: linux
+goarch: amd64
+pkg: beamcast-portable
+cpu: AMD EPYC 9V74 80-Core Processor                
+BenchmarkScale1-5       	       3	 395724264 ns/op
+BenchmarkScale1-5       	       3	 387010334 ns/op
+BenchmarkScale1-5       	       3	 384747910 ns/op
+BenchmarkScale2-5       	       3	 204998984 ns/op
+BenchmarkScale2-5       	       3	 197551044 ns/op
+BenchmarkScale2-5       	       3	 196817519 ns/op
+BenchmarkScale4-5       	       3	 104799174 ns/op
+BenchmarkScale4-5       	       3	 106105964 ns/op
+BenchmarkScale4-5       	       3	 107894759 ns/op
+BenchmarkPostHeavy4-5   	       3	 238477060 ns/op
+BenchmarkPostHeavy4-5   	       3	 238158962 ns/op
+BenchmarkPostHeavy4-5   	       3	 250040926 ns/op
+PASS
+ok  	beamcast-portable	11.329s

@@ -1,0 +1,68 @@
+Beamcast GX 5.8 GPU Dataflow structural benchmark
+=================================================
+
+This environment has no usable physical OpenCL device, so no fake GPU millisecond percentage is reported. The measurements below are deterministic data-layout / transfer / compiler-IR changes relative to the 5.7 OpenCL path.
+
+BVH traversal state
+-------------------
+5.7: 32-int private traversal stack/work-item + overflow fallback
+5.8: stackless threaded BVH, 0 traversal-stack ints/work-item
+Optimized Clang OpenCL IR:
+  5.7 contained [32 x i32] private stack allocas
+  5.8 contains no traversal stack array
+
+GPU node record
+---------------
+5.7: 40 bytes/node
+5.8: 32 bytes/node
+Reduction: 20.0%
+
+GPU material record
+-------------------
+5.7: 36 bytes/material
+5.8: 32 bytes/material
+Reduction: 11.1%
+
+Primitive candidate data
+------------------------
+5.7 candidate stream: 4-byte order index + 64-byte universal primitive = 68 bytes
+5.8 sphere:   4-byte typed leaf ref + 32-byte sphere = 36 bytes (~47.06% less)
+5.8 triangle: 4-byte typed leaf ref + 40-byte triangle = 44 bytes (~35.29% less)
+
+The old source-index `order[]` stream is replaced with a typed leaf-reference stream. This keeps the 4-byte leaf reference but removes the second source-primitive lookup and lets spheres/triangles live in compact dedicated arrays.
+
+Modeled built-in scene GPU geometry/material/BVH footprint
+---------------------------------------------------------
+Showcase:    640 B ->   436 B  (31.9% reduction)
+Cornell:     992 B ->   692 B  (30.2% reduction)
+Stress:   76,604 B -> 46,168 B  (39.7% reduction)
+
+Guide transfer
+--------------
+5.7: 16 bytes/pixel guide payload
+5.8: 12 bytes/pixel guide payload
+Guide reduction: 25.0%
+
+With 16-byte HDR color+telemetry output:
+5.7 color+guide: 32 bytes/pixel
+5.8 color+guide: 28 bytes/pixel
+Total reduction when guides are enabled: 12.5%
+
+1920x1080 guide-enabled readback:
+5.7: ~63.28 MiB
+5.8: ~55.37 MiB
+Saved: ~7.91 MiB/frame
+
+Additional changes
+------------------
+- separate guide-free and guide-producing kernels
+- non-blocking refit uploads on the in-order queue
+- sphere radius^2 and inverse radius precomputed on CPU
+- compact power-of-two 32-byte node/material/sphere strides
+- persistent OpenCL resources retained across camera-only renders
+- 2D NDRange retained
+- ray telemetry remains embedded in float4.w, so no telemetry buffer/readback
+
+Hardware note
+-------------
+Run Benchmark -> GPU / OpenCL probe or FULL GIGA benchmark on the destination GPU for actual render-time measurements.

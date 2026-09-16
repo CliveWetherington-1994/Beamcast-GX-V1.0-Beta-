@@ -1,0 +1,14 @@
+Beamcast GX 4.0 research benchmark
+Verified: 2026-09-15
+Compiler/build: GNU C++ 14.2.0, Release
+
+primitives=16000 rays=77361 hits=72957
+wide_build_ms=1.10991 wide_nodes=1225 occupancy=0.56898 bytes=836000
+binary_trace_ms=14.811 binary_box_tests=2341125
+wide_trace_ms=43.1682 wide_box_tests=2833717 hit_match=1
+queue_coherence_before=0 after=0.999599 sort_ns=1.04673e+06 estimated_saved_ns=6.1864e+06 sort=1
+
+Interpretation:
+- Quantized BVH8 produced hit-equivalent closest-hit results for this benchmark.
+- BVH8 is retained as a GPU bandwidth/occupancy experiment; it is slower than the binary BVH on this CPU workload.
+- Queue radix ordering is recommended here because estimated divergence savings exceed measured sort cost.

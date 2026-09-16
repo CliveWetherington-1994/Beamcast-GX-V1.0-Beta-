@@ -1,0 +1,7 @@
+#version 450
+layout(local_size_x=256) in;
+layout(set=0,binding=0,std430) readonly buffer Flags { uint flags[]; };
+layout(set=0,binding=1,std430) readonly buffer Prefix { uint prefix[]; };
+layout(set=0,binding=2,std430) writeonly buffer Output { uint compacted[]; };
+layout(push_constant) uniform Params { uint count; } pc;
+void main(){uint gid=gl_GlobalInvocationID.x;if(gid<pc.count&&flags[gid]!=0u)compacted[prefix[gid]]=gid;}

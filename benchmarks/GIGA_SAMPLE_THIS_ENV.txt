@@ -1,0 +1,72 @@
+BEAMCAST GIGA BENCHMARK
+FULL GIGA SUITE
+
+CPU scaling - 1 worker(s)
+  448x252, 4 spp, 6 bounces | 0.334 s | 1 worker(s)
+  902710 rays | 2.70 Mray/s
+  0.34 Mpix/s
+  backend: CPU | Host CPU
+
+CPU scaling - 2 worker(s)
+  448x252, 4 spp, 6 bounces | 0.184 s | 2 worker(s)
+  902099 rays | 4.91 Mray/s
+  0.61 Mpix/s
+  backend: CPU | Host CPU
+
+CPU scaling - 4 worker(s)
+  448x252, 4 spp, 6 bounces | 0.096 s | 4 worker(s)
+  901959 rays | 9.41 Mray/s
+  1.18 Mpix/s
+  backend: CPU | Host CPU
+
+CPU scaling - 5 worker(s)
+  448x252, 4 spp, 6 bounces | 0.075 s | 5 worker(s)
+  902423 rays | 12.08 Mray/s
+  1.51 Mpix/s
+  backend: CPU | Host CPU
+
+Tracing baseline
+  640x360, 2 spp, 4 bounces | 0.075 s | 5 worker(s)
+  872714 rays | 11.62 Mray/s
+  3.07 Mpix/s
+  backend: CPU | Host CPU
+
+Full multicore post stack
+  640x360, 2 spp, 4 bounces | 0.195 s | 5 worker(s)
+  517172 rays | 2.65 Mray/s
+  1.18 Mpix/s
+  backend: CPU | Host CPU
+
+Path Tracing
+  384x216, 2 spp, 5 bounces | 0.034 s | 5 worker(s)
+  300707 rays | 8.76 Mray/s
+  2.42 Mpix/s
+  backend: CPU | Host CPU
+
+Recursive Ray Tracing
+  384x216, 2 spp, 5 bounces | 0.034 s | 5 worker(s)
+  300455 rays | 8.96 Mray/s
+  2.47 Mpix/s
+  backend: CPU | Recursive Ray Tracing
+
+Photon Mapping
+  384x216, 2 spp, 5 bounces | 0.047 s | 5 worker(s)
+  301809 rays | 6.45 Mray/s
+  1.77 Mpix/s
+  backend: CPU | Photon Mapping
+
+OpenCL GPU probe
+  640x360, 4 spp, 6 bounces | 0.120 s
+  1767805 rays | 14.75 Mray/s
+  1.92 Mpix/s
+  backend: CPU fallback | OpenCL GPU backend unavailable on this platform
+  No OpenCL execution confirmed; result may be CPU fallback.
+
+SUMMARY
+  GIGA Score: 659
+  GIGA Score = geometric mean of measured Mray/s x 100.
+  Logical CPUs visible to runtime: 5
+
+Suite wall time: 1.22 s
+
+Numbers are comparable only when the same Beamcast benchmark mode and build are used.

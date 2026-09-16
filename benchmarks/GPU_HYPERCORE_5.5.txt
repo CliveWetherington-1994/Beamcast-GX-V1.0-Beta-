@@ -1,0 +1,78 @@
+BEAMCAST GX 5.5 GPU HYPERCORE - STRUCTURAL OPTIMIZATION REPORT
+==============================================================
+Date: 2026-09-16
+
+GPU execution limitation
+------------------------
+No physical OpenCL device/ICD is exposed in the build environment, so an on-GPU render-time percentage is intentionally not claimed.
+
+Offline OpenCL kernel comparison
+--------------------------------
+Both kernels compiled with clang OpenCL 1.2 to optimized LLVM IR.
+
+5.4 kernel IR lines: 1217
+5.5 kernel IR lines: 1073
+
+5.4 integer pixel-coordinate sdiv: 1
+5.5 integer pixel-coordinate sdiv: 0
+
+5.4 integer pixel-coordinate srem: 1
+5.5 integer pixel-coordinate srem: 0
+
+5.4 IR contains sin/cos/pow hot-path references.
+5.5 removes those hot-path sin/cos/pow references.
+
+Private traversal stack
+-----------------------
+5.4: 96 x int = 384 bytes declared per work-item
+5.5: 32 x int = 128 bytes declared per work-item
+Static declared stack reduction: 66.7%
+
+Readback payload
+----------------
+5.4 color framebuffer: float4 = 16 bytes/pixel
+5.4 separate ray telemetry: uint = 4 bytes/pixel
+Total baseline readback payload: 20 bytes/pixel
+
+5.5 color + telemetry: float4 = 16 bytes/pixel
+Total: 16 bytes/pixel
+Payload reduction: 20%
+
+At 1920x1080:
+- removed ray telemetry readback: 8,294,400 bytes (~7.91 MiB)
+- old total color+ray payload: 41,472,000 bytes (~39.55 MiB)
+- new total color+ray payload: 33,177,600 bytes (~31.64 MiB)
+
+Persistent-runtime savings
+--------------------------
+Old repeated GPU render path recreated/recompiled/reuploaded:
+- device lookup
+- context
+- command queue
+- program
+- kernel
+- node/order/primitive/material/light buffers
+- output buffer
+- ray telemetry buffer
+
+5.5 camera-only repeated render reuses:
+- context
+- command queue
+- compiled program
+- kernel
+- node/order/primitive/material buffers
+- output buffer capacity
+
+Geometry-only refits update node + primitive buffers without recreating order/material buffers.
+
+CPU regression check in this session
+------------------------------------
+Fixed specialist CPU benchmark, 5 groups x 5 iterations:
+65.276710 ms/op
+69.438593 ms/op
+73.100493 ms/op
+73.025930 ms/op
+67.826112 ms/op
+Median: 69.438593 ms/op
+
+This is a no-regression check only; the machine differs from the prior 5.4 benchmark environment.

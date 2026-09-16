@@ -1,0 +1,22 @@
+Beamcast GX 4.3 validation
+
+Summary
+-------
+- Added practical final-render rotation in Beamcast Studio (View menu, control panel, [ and ] shortcuts).
+- Kept GUI and CLI executables as first-class deliverables.
+- Source builds and tests cleanly on Linux/x86-64.
+
+Validation
+----------
+Release build:                PASS
+Test suite:                   9 / 9 PASS
+Warnings as errors (-Werror): PASS
+CLI smoke render:             PASS
+X11 Studio smoke launch:      PASS
+Clean source ZIP rebuild:      PASS
+
+Deliverables
+------------
+- beamcast-studio executable
+- beamcast-cli executable
+- source package with Win32 and X11 Studio frontends

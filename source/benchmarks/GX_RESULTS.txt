@@ -1,0 +1,44 @@
+Beamcast GX development-environment measurements
+================================================
+
+Correctness / safety
+--------------------
+Release CTest: 5/5 passed
+ASan + UBSan CTest: 5/5 passed
+OpenCL 1.2 syntax: passed with clang 17 -fsyntax-only
+
+GX synthetic benchmark
+----------------------
+Primitives: 30,001 spheres
+BVH nodes: 21,259
+
+Full GPU payload:      2.44212 MiB
+Quantized GPU payload: 1.87447 MiB
+Reduction:             ~23.24% total exported payload
+
+Fixed 4 spp:
+  primary paths:       230,400
+  total rays:          611,006
+  render time:         186.501 ms
+  throughput:          3.27616 Mray/s
+
+Foveated VRS 4 spp max, strength 0.82, 1 spp minimum:
+  primary paths:       184,596
+  total rays:          505,051
+  render time:         157.106 ms
+  skipped primary:      45,804
+
+Primary-path reduction: ~19.8802%
+Measured time reduction: ~15.7608%
+
+GX demonstration scene
+----------------------
+Resolution: 960x540
+Samples: 12 spp
+Max bounces: 12
+Light candidates: 6
+Denoiser: 4 a-trous iterations
+Measured time: ~3.04019 s
+Measured throughput: ~9.24872 Mray/s
+
+All timings are machine- and workload-specific sanity measurements, not universal performance claims.

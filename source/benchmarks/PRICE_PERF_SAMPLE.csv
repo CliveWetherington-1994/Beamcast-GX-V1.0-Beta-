@@ -1,0 +1,2 @@
+device,backend,price_usd,frame_ms,energy_joules,resident_bytes,mse,psnr_db,ssim,fps_per_dollar,quality_per_joule
+"host-cpu",CPU,0,29.2514,0,9809920,0.0125729,19.0056,0.986515,0,0

@@ -1,0 +1,40 @@
+BEAMCAST GX 5.9 ULTRA REALISM - COMPLETE PROJECT
+
+PREBUILT WINDOWS EXECUTABLES
+----------------------------
+bin/windows-x64/BeamcastStudio.exe
+bin/windows-x64/beamcast-cli.exe
+
+PORTABLE WINDOWS SOURCE
+-----------------------
+windows_portable/main_windows.go
+windows_portable/renderer.go
+windows_portable/gpu_opencl_windows.go
+windows_portable/gpu_opencl_stub.go
+windows_portable/cli_windows.go
+windows_portable/renderer_test.go
+windows_portable/gigabench.go
+
+5.9 HIGHLIGHTS
+--------------
+Ultra Realism quality preset
+CPU/Auto MIS + Halton fidelity transport
+Explicit OpenCL-compatible Ultra Realism variant
+1440p / 256 spp / 16 bounces
+Native-resolution final rendering
+Tight adaptive convergence
+Late Russian roulette
+ACES-style HDR
+Reworked 460 px Win32 inspector padding/layout
+Unified paint and hit-test button geometry
+Combined Scene / Telemetry block
+Duplicate status draw fix
+
+RETAINED RESEARCH SYSTEMS
+-------------------------
+5.8 GPU Dataflow / stackless threaded GPU BVH
+5.7 GIGA Benchmark menu
+5.6 multicore scheduler and parallel post stack
+5.5 persistent OpenCL runtime
+5.4 CPU micro-tuning
+Canonical C++17 Classic/HX/GX engine under source/

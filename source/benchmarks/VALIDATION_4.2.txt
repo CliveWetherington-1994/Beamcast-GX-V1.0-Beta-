@@ -1,0 +1,33 @@
+Beamcast GX 4.2 validation summary
+==================================
+
+Release / GNU 14.2
+- 9/9 tests passed.
+- beamcast_studio_core_test performs a real 64x36 render, OBJ import, and render cancellation.
+- beamcast-cli completed a real headless smoke render and wrote a valid P6 PPM.
+- X11 Beamcast Studio launched successfully under Xvfb.
+
+Warnings-as-errors
+- Full project compiled with -Wall -Wextra -Wpedantic -Werror.
+- 9/9 tests passed.
+
+AddressSanitizer + UndefinedBehaviorSanitizer
+- Full test suite: 9/9 passed.
+- X11 GUI launch smoke test passed under Xvfb.
+- No sanitizer diagnostics observed.
+
+ThreadSanitizer
+- 9/9 tests passed, including GX concurrent residency stress and Studio core async render/cancel.
+- No ThreadSanitizer diagnostics observed.
+
+Clang 17 Release
+- Full project compiled.
+- 9/9 tests passed.
+
+Install / consumer
+- CMake install completed for library, Studio, CLI, headers, docs, GPU sources and package config.
+- External find_package(beamcast 4.2 CONFIG REQUIRED) consumer compiled and ran successfully.
+
+Platform qualification
+- Linux/X11 frontend was compiled and launch-tested in this environment.
+- Win32 frontend is implemented using only Windows system APIs and is wired into CMake as BeamcastStudio.exe; a Windows/MinGW runtime was not available in this Linux environment, so the Windows binary itself could not be executed here.

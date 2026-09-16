@@ -1,0 +1,49 @@
+BEAMCAST GX 5.4 MICROTUNE BENCHMARK
+===================================
+Environment: Linux amd64, Intel Xeon Platinum 8370C @ 2.80 GHz
+Date: 2026-09-15
+
+Fixed workload
+--------------
+320x180
+6 spp
+6 bounces
+CPU path tracing
+MIS enabled
+power-weighted light selection enabled
+Random sampler
+Denoise/post disabled
+Progressive framebuffer updates disabled
+Adaptive sampling disabled
+1x stochastic MSAA
+
+5.3 baseline, 7 x 5-render benchmark groups
+-------------------------------------------
+115.081243 ms/op
+119.308250 ms/op
+118.685612 ms/op
+170.725019 ms/op
+215.508334 ms/op
+121.275838 ms/op
+117.369316 ms/op
+Median: 119.308250 ms/op
+
+5.4 MicroTuned, 7 x 5-render benchmark groups
+----------------------------------------------
+86.791865 ms/op
+87.682770 ms/op
+90.402098 ms/op
+88.069112 ms/op
+88.846453 ms/op
+87.516875 ms/op
+89.396918 ms/op
+Median: 88.069112 ms/op
+
+Median render-time reduction: 26.18%
+Median throughput improvement: 1.355x
+
+Notes
+-----
+- Results are local development measurements, not universal guarantees.
+- No render resolution, spp, bounce depth, MIS, or light-sampling quality was reduced.
+- A custom xorshift RNG experiment was rejected after benchmarking showed no meaningful advantage over Go's math/rand on this toolchain.

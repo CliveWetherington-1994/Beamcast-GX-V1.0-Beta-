@@ -1,0 +1,98 @@
+Beamcast GX 4.1 validation
+Date: 2026-09-15
+
+Scope
+-----
+This validation covers the 4.1 robustness/usability changes plus the existing Classic/HX/GX regression suite.
+No test campaign can prove the absence of all defects; these results document what was actually exercised.
+
+Release build (GCC 14.2.0)
+--------------------------
+PASS: configure + build with tests/examples enabled.
+PASS: 8/8 CTest tests.
+Tests:
+  beamcast_smoke
+  beamcast_hx_test
+  beamcast_gx_test
+  beamcast_gx_abi_test
+  beamcast_gx_stream_test
+  beamcast_gx_research_test
+  beamcast_gx_stress_test
+  beamcast_easy_test
+
+Warnings-as-errors
+------------------
+Compiler flags: -Wall -Wextra -Wpedantic -Werror
+PASS: build.
+PASS: 8/8 CTest tests.
+
+AddressSanitizer + UndefinedBehaviorSanitizer
+---------------------------------------------
+Flags: -fsanitize=address,undefined -fno-omit-frame-pointer
+PASS: build.
+PASS: 8/8 CTest tests.
+PASS: no ASan/UBSan diagnostics.
+
+ThreadSanitizer
+---------------
+Flags: -fsanitize=thread -fno-omit-frame-pointer
+PASS: build.
+PASS: 8/8 CTest tests.
+PASS: no TSan diagnostics.
+
+Clang 17
+--------
+PASS: Release build.
+PASS: 8/8 CTest tests.
+
+OpenCL
+------
+PASS: clang -x cl -cl-std=CL1.2 -fsyntax-only gpu/beamcast_gx.cl
+
+Native GPU specialization probe
+-------------------------------
+PASS: CMake config with BEAMCAST_BUILD_NATIVE_GPU_KERNELS=ON.
+Environment result:
+  glslc: unavailable
+  nvcc/CUDA compiler: unavailable
+  hipcc/HIP compiler: unavailable
+The sources are retained and portable configuration succeeds, but vendor GPU binaries were not executable in this environment.
+
+Install/package consumer
+------------------------
+PASS: default Release build builds only libbeamcast.
+PASS: cmake --install.
+PASS: external project find_package(beamcast 4.1 REQUIRED CONFIG).
+PASS: external consumer linked beamcast::beamcast and ran successfully.
+
+4.1 regression coverage
+-----------------------
+PASS: negative framebuffer dimensions rejected before allocation.
+PASS: framebuffer allocation uses checked size multiplication.
+PASS: invalid/degenerate cameras rejected with std::invalid_argument.
+PASS: zero-direction sphere ray does not divide by zero.
+PASS: null World objects rejected.
+PASS: invalid HX material indices rejected.
+PASS: non-positive HX sphere radii rejected.
+PASS: degenerate HX triangles rejected.
+PASS: packed scene geometry mutation invalidates acceleration and HX render requests rebuild.
+PASS: P6 PPM CRLF raster separator handled correctly.
+PASS: P6 maxval values below 255 scale to 8-bit output correctly.
+PASS: Classic/HX worker progress callback exceptions propagate to the caller instead of std::terminate.
+PASS: easy API automatically builds scene acceleration.
+PASS: easy API normalized progress reaches completion.
+PASS: binary P6 save helper writes a readable output file.
+PASS: zero-allocation GX GPU-payload byte accounting matches explicit exported-buffer byte counts.
+PASS: quantized payload remains smaller than full payload for the ABI test scene.
+
+Performance/correctness fixes in 4.1
+------------------------------------
+- GX report byte accounting no longer exports/copies the complete scene twice per render.
+- HX fixed local traversal stack now spills safely instead of silently dropping BVH nodes.
+- Framebuffer hot-path at() remains unchecked for renderer performance; checked_at() is available for user-facing bounds checks.
+- HX progress callbacks are serialized.
+- Uniform-grid dimension multiplication is checked before allocation.
+
+Archive verification
+--------------------
+PASS: final source archive extracted into a clean directory, configured, rebuilt, and passed 8/8 tests.

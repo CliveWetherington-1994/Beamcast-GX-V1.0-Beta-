@@ -1,0 +1,36 @@
+Beamcast GX 5.7 - GIGA Benchmark design
+=======================================
+
+Menu modes
+----------
+Quick CPU
+Full GIGA Suite
+Multicore Scaling
+Post-processing / Reconstruction
+Integrator Comparison
+GPU / OpenCL Probe
+Show Last Report
+
+Full suite composition
+----------------------
+1. Stress-scene multicore scaling sweep
+2. Baseline vs post/reconstruction workload
+3. Path / recursive / photon integrator comparison
+4. Explicit OpenCL GPU backend probe
+
+Primary metrics
+---------------
+Elapsed render time
+Actual traced rays
+Mray/s
+Mpixel/s where appropriate
+CPU worker speedup
+Parallel efficiency
+Backend/device telemetry
+GIGA Score
+
+GIGA Score definition
+---------------------
+100 * geometric mean of measured Mray/s across ray-producing cases.
+
+The score is intentionally transparent and is only meaningful when comparing the same Beamcast benchmark suite/build.
