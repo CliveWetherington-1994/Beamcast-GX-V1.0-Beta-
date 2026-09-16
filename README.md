@@ -1,4 +1,4 @@
-# Beamcast GX 5.9 Ultra Realism
+# Beamcast GX 5.9 V1.0 Beta
 
 Beamcast GX 5.9 V1.0 Beta is a medium weight ray tracing library, and Windows application. 
 
