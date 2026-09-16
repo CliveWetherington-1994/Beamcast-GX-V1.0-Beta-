@@ -1,0 +1,62 @@
+Beamcast GX 5.7 GIGA Benchmark validation
+=========================================
+Date: 2026-09-16
+
+New 5.7 benchmark subsystem
+---------------------------
+- top-level Benchmark menu added: PASS
+- Quick CPU benchmark: PASS
+- Full GIGA suite: PASS
+- Multicore scaling benchmark: PASS
+- Post-processing / reconstruction benchmark: PASS
+- Integrator comparison benchmark: PASS
+- GPU / OpenCL probe: PASS
+- last benchmark report recall: implemented
+- asynchronous benchmark execution: implemented
+- completion posted back to Win32 UI thread: implemented
+- fallback GPU result excluded from GIGA score: implemented
+- GPU compatibility settings applied in benchmark probe: implemented
+
+Portable renderer validation
+----------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows GUI x64 cross-build: PASS
+- Windows CLI x64 cross-build: PASS
+- GUI identified as PE32+ Windows GUI x86-64: PASS
+- CLI identified as PE32+ Windows console x86-64: PASS
+
+Benchmark regression coverage
+-----------------------------
+- report formatting test: PASS
+- real Quick CPU benchmark execution test: PASS
+- full combined suite execution: PASS
+- sample full-suite report generated: PASS
+
+Sample environment note
+-----------------------
+The included `benchmarks/GIGA_SAMPLE_THIS_ENV.txt` was generated in the build environment.
+The runtime exposed 5 logical CPUs during that run.
+No usable OpenCL GPU backend was available, so the GPU probe correctly reported CPU fallback and did not count that case in GIGA Score.
+
+Canonical C++17 engine
+----------------------
+- fresh CMake Release configure/build: PASS
+- ctest: 9 / 9 PASS
+
+Score definition
+----------------
+GIGA Score = 100 * geometric mean of measured Mray/s across ray-producing benchmark cases.
+An OpenCL GPU probe is included in the score only when backend telemetry confirms OpenCL execution.
+The score is only intended for comparison using the same Beamcast suite/build.
+
+Final archive validation
+------------------------
+- final ZIP extracted into a fresh directory: PASS
+- portable go test ./... from extracted ZIP: PASS
+- Windows GUI cross-build from extracted ZIP: PASS
+- Windows CLI cross-build from extracted ZIP: PASS
+- fresh CMake Release configure/build from extracted ZIP: PASS
+- C++ tests from extracted ZIP: 9 / 9 PASS

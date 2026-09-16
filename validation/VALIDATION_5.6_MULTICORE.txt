@@ -1,0 +1,54 @@
+Beamcast GX 5.6 Multicore HyperScale validation
+================================================
+Date: 2026-09-16
+
+Portable renderer / Studio
+--------------------------
+gofmt: PASS
+go test ./...: PASS
+go test -race ./...: PASS
+Windows-target go vet: PASS
+Windows x64 GUI cross-build: PASS
+Windows x64 CLI cross-build: PASS
+GUI identified as PE32+ Windows GUI x86-64: PASS
+CLI identified as PE32+ Windows console x86-64: PASS
+OpenCL 1.2 kernel syntax validation: PASS
+
+5.6 regression additions
+------------------------
+Parallel post-processing deterministic versus single-thread execution: PASS
+Existing rendering / BVH / photon / temporal / post / save / object editor tests: PASS
+
+Canonical C++17 engine
+----------------------
+Release build with BEAMCAST_BUILD_TESTS=ON: 9 / 9 PASS
+-Wall -Wextra -Wpedantic -Werror build: 9 / 9 PASS
+
+Multicore benchmark summary
+---------------------------
+Fixed path-tracing workload at 4 workers:
+5.5 median: 135.781 ms
+5.6 median: 106.106 ms
+Reduction: 21.85%
+
+Post-heavy workload at 4 workers:
+5.5 median: 520.401 ms
+5.6 median: 238.477 ms
+Reduction: 54.17%
+
+4-worker parallel efficiency:
+5.5: 73.3%
+5.6: 91.2%
+
+Environment limitation
+----------------------
+The container is CPU-quota limited to 4 CPU equivalents, so scaling above four workers cannot be honestly measured here. 8/16/32 worker controls are included for destination machines with more available CPU cores.
+
+Final clean archive validation
+------------------------------
+Initial final ZIP extracted into a new directory: PASS
+Portable Go tests from extracted ZIP: PASS
+Windows GUI rebuild from extracted ZIP: PASS
+Windows CLI rebuild from extracted ZIP: PASS
+Fresh CMake Release configure/build from extracted ZIP: PASS
+Canonical C++ tests from extracted ZIP: 9 / 9 PASS

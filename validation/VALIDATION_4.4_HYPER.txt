@@ -1,0 +1,73 @@
+BEAMCAST GX 4.4 HYPER - VALIDATION
+===================================
+
+C++17 Classic/HX/GX engine
+--------------------------
+Release build + tests:             PASS (9 / 9)
+-Werror build + tests:             PASS (9 / 9)
+ASan + UBSan build + tests:        PASS (9 / 9)
+Linux Studio X11 smoke launch:     PASS
+Linux CLI real 64x36 render:       PASS
+
+Portable native Win32 executable
+--------------------------------
+Host renderer tests:               PASS
+Go race detector:                  PASS
+Windows-target go vet:             PASS
+Windows x64 GUI cross-build:       PASS
+Windows x64 CLI cross-build:       PASS
+PE format inspection:              PASS
+  BeamcastStudio.exe: PE32+ x86-64, Windows GUI subsystem
+  beamcast-cli.exe:   PE32+ x86-64, Windows console subsystem
+
+Portable renderer regression coverage
+-------------------------------------
+- BVH scene construction
+- tiny multi-threaded path render
+- final-render 90-degree rotation
+- OBJ vertex/face parsing and triangulation
+- PPM export
+- BMP export
+- Go race detector over the rendering tests
+
+Windows Studio features in the bundled EXE
+------------------------------------------
+- native Win32 top-level window and menu bar
+- native Open/Save dialogs
+- progressive multi-core tile rendering
+- BVH-accelerated sphere/triangle intersection
+- diffuse / metal / dielectric / emissive materials
+- stochastic multi-bounce path tracing
+- emissive-sphere direct-light sampling
+- Draft / Preview / Balanced / High / Ultra presets
+- edge-aware lightweight denoise pass
+- asynchronous render replacement and cancellation
+- OBJ import, triangulation, automatic camera framing
+- left-drag orbit
+- right-drag pan
+- mouse-wheel dolly/zoom
+- optional auto-render after camera movement
+- final-render rotation left/right/reset without retracing
+- save displayed orientation as PPM or BMP
+- built-in showcase, Cornell-like, and stress scenes
+- render progress, seconds, ray count, Mray/s, primitive count, BVH-node count
+
+Windows executable hashes
+-------------------------
+BeamcastStudio.exe
+732326c2d97d065d525b93a993247cb1ded0d94965a02edfba38ce5ddfe8881e
+
+beamcast-cli.exe
+409e5c6100469ee7f46ccbbfc69687736c20bf9587383582e122357cb2dcf0d7
+
+Runtime note
+------------
+The Windows PE files were cross-compiled and structurally inspected in this Linux environment. No Wine/Windows runtime is installed here, so the PE GUI itself could not be launched on a Windows kernel in this session. The renderer core used by the executable was executed under normal tests and the Go race detector, and the Windows-specific source was vetted and cross-compiled successfully.
+
+Clean final archive validation
+------------------------------
+Final ZIP extracted to an empty directory: PASS
+Portable renderer tests from extracted ZIP: PASS
+Portable renderer race test from extracted ZIP: PASS
+C++17 engine rebuilt from extracted ZIP: PASS
+C++17 tests from extracted ZIP: PASS (9 / 9)

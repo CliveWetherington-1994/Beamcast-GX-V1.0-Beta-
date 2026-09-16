@@ -1,0 +1,26 @@
+Beamcast GX 4.5 Industry validation
+===================================
+
+Package root: /mnt/data/beamcast_gx_4.5_industry
+Date: 2026-09-15
+
+Validation performed:
+1. gofmt applied to portable Windows source.
+2. Portable Go renderer tests passed:
+   go test ./...
+3. Windows GUI executable built successfully:
+   GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-H=windowsgui -s -w" -o ../bin/windows-x64/BeamcastStudio.exe .
+4. Windows CLI executable built successfully:
+   GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -tags beamcast_cli -trimpath -ldflags "-s -w" -o ../bin/windows-x64/beamcast-cli.exe .
+5. file(1) confirmed both outputs as PE32+ Windows x64 executables.
+
+Functional update summary:
+- idle redraw behavior reduced to lower flicker
+- double-buffered paint path added
+- Render menu expanded with resolution / backend / DLSS-style upscaling options
+- CLI extended with -backend and -upscale flags
+
+Known constraints:
+- portable renderer remains CPU-based
+- GPU preferred selection is UI / project-flow level in this build and falls back to CPU execution
+- DLSS-style upscale is a lightweight internal-resolution upscale and sharpen pipeline, not NVIDIA DLSS

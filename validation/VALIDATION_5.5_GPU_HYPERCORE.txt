@@ -1,0 +1,51 @@
+Beamcast GX 5.5 GPU HyperCore validation
+========================================
+Date: 2026-09-16
+
+Portable renderer / Studio
+--------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows x64 GUI cross-build: PASS
+- Windows x64 CLI cross-build: PASS
+- GUI identified as PE32+ Windows GUI x86-64: PASS
+- CLI identified as PE32+ Windows console x86-64: PASS
+
+OpenCL
+------
+- embedded kernel extracted from Go source: PASS
+- clang OpenCL C 1.2 syntax validation: PASS
+- fast-relaxed-math/MAD compile options wired into Windows runtime: PASS
+- persistent OpenCL context/program/kernel cache: compiled
+- topology/geometry revision-aware scene caching: compiled
+- 2D NDRange dispatch: compiled
+- separate ray-count buffer/readback removed: compiled
+- optional compact GPU first-hit guide output: compiled
+- 32-int traversal stack with correctness fallback: compiled
+- glass front-face bug fix: compiled
+
+Portable regression coverage
+----------------------------
+- existing renderer/editor/AA/post/temporal/integrator tests: PASS
+- scene GPU topology/geometry revision tracking: PASS
+
+Canonical C++17 engine
+----------------------
+Release build with tests: 9 / 9 PASS
+-Wall -Wextra -Wpedantic -Werror build: 9 / 9 PASS
+
+Hardware limitation
+-------------------
+No OpenCL ICD/device is exposed in this environment. End-to-end GPU runtime/performance therefore cannot be honestly measured here. GPU percentage improvements must be benchmarked on the destination machine.
+
+Final clean archive validation
+------------------------------
+- final ZIP integrity test: PASS
+- extracted portable go test ./...: PASS
+- Windows GUI rebuild from extracted ZIP: PASS
+- Windows CLI rebuild from extracted ZIP: PASS
+- extracted OpenCL C 1.2 syntax validation: PASS
+- fresh CMake Release configure/build from extracted ZIP: PASS
+- C++ tests from extracted ZIP: 9 / 9 PASS

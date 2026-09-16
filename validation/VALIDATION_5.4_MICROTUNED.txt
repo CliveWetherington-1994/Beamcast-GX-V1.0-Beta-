@@ -1,0 +1,73 @@
+Beamcast GX 5.4 MicroTuned Research validation
+===============================================
+Date: 2026-09-15
+
+Primary optimization benchmark
+------------------------------
+Fixed workload:
+- 320x180
+- 6 spp
+- 6 bounces
+- CPU path tracing
+- MIS enabled
+- power-weighted light selection enabled
+- Random sampler
+- denoise/post disabled
+- progressive framebuffer updates disabled
+- adaptive sampling disabled
+- 1x stochastic MSAA
+
+5.3 median: 119.308250 ms/render
+5.4 median: 88.069112 ms/render
+Measured median render-time reduction: 26.18%
+Measured throughput improvement: 1.355x
+
+Important: this is a local benchmark result, not a guarantee for every scene or CPU.
+
+5.4 micro-optimizations retained
+--------------------------------
+- dedicated any-hit shadow/occlusion BVH traversal
+- smaller Hit record; winning hit position reconstructed from ray + t
+- RenderSettings passed by pointer through hot integrator paths
+- trig-free cosine hemisphere sampler via disk rejection + Malley projection
+- Marsaglia uniform sphere-direction sampler
+- precomputed ray direction length squared and reciprocal reused by sphere tests
+- 16-entry local BVH traversal stacks with recursive overflow fallback
+- Schlick x^5 evaluated by multiplies instead of generic pow
+- custom RNG experiment rejected and removed after no measurable benefit
+
+Portable renderer validation
+----------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows x64 GUI cross-build: PASS
+- Windows x64 CLI cross-build: PASS
+- GUI output identified as PE32+ Windows GUI x86-64: PASS
+- CLI output identified as PE32+ Windows console x86-64: PASS
+
+New correctness coverage
+------------------------
+- any-hit Occluded() matches closest-hit visibility over 3000 deterministic stress-scene rays: PASS
+- cosine hemisphere samples remain unit length and above the requested hemisphere: PASS
+- existing renderer / reconstruction / editor / BVH regression tests: PASS
+
+Canonical C++17 engine
+----------------------
+Fresh CMake Release configure/build: PASS
+C++ test suite: 9 / 9 PASS
+
+Platform note
+-------------
+The Windows PE binaries are cross-built in this Linux environment. They are structurally validated as Windows x64 executables, but Windows runtime execution is not available in this environment.
+
+Final archive verification
+--------------------------
+- exact ZIP extracted into a fresh directory: PASS
+- portable go test ./... from extracted ZIP: PASS
+- Windows GUI rebuilt from extracted ZIP: PASS
+- Windows CLI rebuilt from extracted ZIP: PASS
+- extracted Windows outputs identified as PE32+ x64: PASS
+- fresh CMake Release build from extracted ZIP: PASS
+- C++ tests from extracted ZIP: 9 / 9 PASS

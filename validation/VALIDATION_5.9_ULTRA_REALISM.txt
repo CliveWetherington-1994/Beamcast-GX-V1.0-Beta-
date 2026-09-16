@@ -1,0 +1,56 @@
+Beamcast GX 5.9 Ultra Realism validation
+========================================
+Date: 2026-09-16
+
+Portable renderer / application
+-------------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows x64 GUI cross-build: PASS
+- Windows x64 CLI cross-build: PASS
+- BeamcastStudio.exe identified as PE32+ Windows GUI x86-64: PASS
+- beamcast-cli.exe identified as PE32+ Windows console x86-64: PASS
+- OpenCL 1.2 kernel syntax validation with clang: PASS
+
+5.9 regression coverage
+-----------------------
+- Ultra Realism preset label/resolution: PASS
+- Ultra Realism 256 spp / 16 bounce floor: PASS
+- CPU Ultra Realism MIS / power-light / Halton transport: PASS
+- CPU Ultra Realism disables HBAO / FXAA / firefly clamp: PASS
+- explicit GPU Ultra Realism switches to OpenCL-compatible transport: PASS
+- explicit GPU Ultra Realism retains high sample/bounce quality: PASS
+- existing renderer, post, BVH, GPU-layout and GIGA benchmark tests: PASS
+
+UI layout fixes
+---------------
+- inspector width: 460 px
+- horizontal content padding: 22 px
+- two-column control gap: 10 px
+- panel button drawing and hit-testing share one rectangle generator
+- duplicate bottom status draw removed
+- Scene + Telemetry consolidated upward for footer clearance
+- default-window control geometry cross-compiles successfully for Windows x64
+
+Canonical C++17 engine
+----------------------
+- Release configure/build with BEAMCAST_BUILD_TESTS=ON: PASS
+- Release tests: 9 / 9 PASS
+- -Wall -Wextra -Wpedantic -Werror build: PASS
+- -Werror tests: 9 / 9 PASS
+
+Hardware limitation
+-------------------
+This environment does not expose a usable physical OpenCL GPU. The explicit-GPU Ultra Realism configuration is compile/test validated, but final on-card image quality and timing should be checked using the destination machine and Beamcast's integrated GIGA/GPU benchmark.
+
+Clean archive validation
+------------------------
+- candidate ZIP extracted to a fresh directory: PASS
+- portable go test ./... from extracted ZIP: PASS
+- Windows GUI rebuild from extracted ZIP: PASS
+- Windows CLI rebuild from extracted ZIP: PASS
+- OpenCL 1.2 kernel syntax from extracted ZIP: PASS
+- fresh CMake Release configure/build from extracted ZIP: PASS
+- C++ tests from extracted ZIP: 9 / 9 PASS

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+  <FileVersion major="1" minor="6" />
+  <Project>
+    <Option title="Beamcast Studio 4.3" />
+    <Option pch_mode="2" />
+    <Option compiler="gcc" />
+    <Build>
+      <Target title="Release">
+        <Option output="../../bin/windows-x64/BeamcastStudio" prefix_auto="0" extension_auto="1" />
+        <Option object_output="obj/Release" />
+        <Option type="0" />
+        <Option compiler="gcc" />
+        <Compiler>
+          <Add option="-O3" />
+          <Add option="-std=c++17" />
+          <Add option="-Wall" />
+          <Add option="-Wextra" />
+          <Add option="-pthread" />
+          <Add directory="../../source/include" />
+          <Add directory="../../source/app" />
+        </Compiler>
+        <Linker>
+          <Add option="-pthread" />
+          <Add option="-mwindows" />
+          <Add library="comdlg32" />
+          <Add library="gdi32" />
+          <Add library="user32" />
+        </Linker>
+      </Target>
+    </Build>
+    <Compiler>
+      <Add option="-std=c++17" />
+      <Add directory="../../source/include" />
+      <Add directory="../../source/app" />
+    </Compiler>
+    <Unit filename="../../source/src/bvh.cpp" />
+    <Unit filename="../../source/src/easy.cpp" />
+    <Unit filename="../../source/src/gx.cpp" />
+    <Unit filename="../../source/src/gx_research.cpp" />
+    <Unit filename="../../source/src/gx_stream.cpp" />
+    <Unit filename="../../source/src/hx.cpp" />
+    <Unit filename="../../source/src/material.cpp" />
+    <Unit filename="../../source/src/mesh.cpp" />
+    <Unit filename="../../source/src/renderer.cpp" />
+    <Unit filename="../../source/src/texture.cpp" />
+    <Unit filename="../../source/src/uniform_grid.cpp" />
+    <Unit filename="../../source/src/world.cpp" />
+    <Unit filename="../../source/app/studio_core.cpp" />
+    <Unit filename="../../source/app/studio_win32.cpp" />
+    <Unit filename="../../source/app/studio_core.hpp" />
+    <Unit filename="../../source/include/beamcast/aabb.hpp" />
+    <Unit filename="../../source/include/beamcast/beamcast.hpp" />
+    <Unit filename="../../source/include/beamcast/bvh.hpp" />
+    <Unit filename="../../source/include/beamcast/camera.hpp" />
+    <Unit filename="../../source/include/beamcast/easy.hpp" />
+    <Unit filename="../../source/include/beamcast/framebuffer.hpp" />
+    <Unit filename="../../source/include/beamcast/gx.hpp" />
+    <Unit filename="../../source/include/beamcast/gx_research.hpp" />
+    <Unit filename="../../source/include/beamcast/gx_stream.hpp" />
+    <Unit filename="../../source/include/beamcast/hittable.hpp" />
+    <Unit filename="../../source/include/beamcast/hx.hpp" />
+    <Unit filename="../../source/include/beamcast/material.hpp" />
+    <Unit filename="../../source/include/beamcast/mesh.hpp" />
+    <Unit filename="../../source/include/beamcast/random.hpp" />
+    <Unit filename="../../source/include/beamcast/ray.hpp" />
+    <Unit filename="../../source/include/beamcast/renderer.hpp" />
+    <Unit filename="../../source/include/beamcast/sphere.hpp" />
+    <Unit filename="../../source/include/beamcast/texture.hpp" />
+    <Unit filename="../../source/include/beamcast/triangle.hpp" />
+    <Unit filename="../../source/include/beamcast/uniform_grid.hpp" />
+    <Unit filename="../../source/include/beamcast/vec3.hpp" />
+    <Unit filename="../../source/include/beamcast/world.hpp" />
+    <Extensions />
+  </Project>
+</CodeBlocks_project_file>

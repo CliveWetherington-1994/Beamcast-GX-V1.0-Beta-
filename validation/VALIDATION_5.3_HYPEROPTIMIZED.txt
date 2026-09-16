@@ -1,0 +1,82 @@
+Beamcast GX 5.3 HyperOptimized Research validation
+==================================================
+Date: 2026-09-15
+
+Portable renderer / Studio
+--------------------------
+- gofmt on windows_portable/*.go: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- GOOS=windows GOARCH=amd64 go vet .: PASS
+- Windows GUI cross-build: PASS
+- Windows CLI cross-build: PASS
+- BeamcastStudio.exe identified as PE32+ Windows GUI x86-64: PASS
+- beamcast-cli.exe identified as PE32+ Windows console x86-64: PASS
+- embedded OpenCL kernel syntax checked as OpenCL 1.2 with clang: PASS
+
+New 5.3 optimization regression coverage
+----------------------------------------
+- fast AABB test vs reference slab test: PASS
+- SAH BVH vs median BVH hit equivalence: PASS
+- BVH refit vs full rebuild hit equivalence: PASS
+- center-first tile order permutation / center priority: PASS
+- cached emissive-light PMF/CDF normalization: PASS
+- final-only throughput render: PASS
+- prepared Halton/R2 sample bounds: PASS
+- existing integrator / temporal / post / object / save-format tests: PASS
+
+Canonical C++17 engine
+----------------------
+- Release configure/build: PASS
+- Release tests: 9 / 9 PASS
+- -Wall -Wextra -Wpedantic -Werror configure/build: PASS
+- -Werror tests: 9 / 9 PASS
+- Linux CLI 64x36 real render: PASS
+- Linux X11 Studio smoke under xvfb-run: PASS
+
+Local optimization benchmark snapshot
+-------------------------------------
+Environment: Linux amd64, Intel Xeon Platinum 8370C @ 2.80 GHz.
+These are local development measurements, not universal guarantees.
+
+Stress BVH traversal, 2048 deterministic rays:
+- 5.2 baseline median: 2.236430 ms/op
+- 5.3 SAH16 optimized median: 0.810168 ms/op
+- median speedup: 2.76x
+- optimized traversal: 0 B/op, 0 allocs/op
+
+End-to-end tiny stress render (256x144, CPU, 2 spp, 3 bounces, denoise):
+- 5.2 median: 173.871692 ms/op
+- 5.3 median: 80.076029 ms/op
+- median speedup: 2.17x
+
+Interactive acceleration update:
+- full SAH rebuild median: 2.378642 ms/op
+- BVH refit median: 0.113501 ms/op
+- median transform update improvement: ~20.96x
+
+Halton 64-sample jitter loop:
+- legacy median: 4.113 us/op
+- prepared sequence median: 0.09802 us/op
+- median sampler overhead reduction: ~41.96x
+- both paths: 0 B/op, 0 allocs/op
+
+Hardware limitation
+-------------------
+This environment does not expose a usable physical OpenCL GPU. The Win32 OpenCL host path cross-builds and the embedded kernel passes OpenCL 1.2 syntax validation, but end-to-end GPU performance must be measured on the destination machine with an actual OpenCL-capable GPU/driver.
+
+Scope note
+----------
+No claim of "best optimization in the world" is made. Such a claim would require reproducible benchmarking against established production renderers across multiple CPUs, GPUs, scenes, quality targets, drivers, memory budgets, and power constraints.
+
+Final clean archive validation
+------------------------------
+- final ZIP extracted to a clean temporary directory: PASS
+- ZIP integrity test: PASS
+- portable `go test ./...` from extracted ZIP: PASS
+- Windows x64 GUI rebuild from extracted ZIP: PASS
+- Windows x64 CLI rebuild from extracted ZIP: PASS
+- rebuilt GUI identified as PE32+ Windows GUI x86-64: PASS
+- rebuilt CLI identified as PE32+ Windows console x86-64: PASS
+- fresh CMake Release configure/build from extracted ZIP: PASS
+- canonical C++ tests from extracted ZIP: 9 / 9 PASS

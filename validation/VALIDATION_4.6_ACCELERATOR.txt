@@ -1,0 +1,32 @@
+Beamcast GX 4.6 Accelerator validation
+======================================
+
+Package root: /mnt/data/beamcast_gx_4.6
+Date: 2026-09-15
+
+Portable Windows frontend validation
+------------------------------------
+- gofmt applied to `windows_portable/*.go`
+- `go test ./...` passed
+- Windows GUI executable built successfully:
+  GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-H=windowsgui -s -w" -o ../bin/windows-x64/BeamcastStudio.exe .
+- Windows CLI executable built successfully:
+  GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -tags beamcast_cli -trimpath -ldflags "-s -w" -o ../bin/windows-x64/beamcast-cli.exe .
+- both executables identified as PE32+ x64 binaries
+
+Portable 4.6 functional updates
+-------------------------------
+- improved DLSS-style upscale path using bicubic reconstruction and edge-aware sharpening
+- added Ultra Quality upscale mode
+- backend naming adjusted to Auto / CPU / OpenCL GPU
+- CLI accepts `--backend auto|cpu|gpu|opencl`
+- CLI accepts `--upscale off|ultra|balanced|performance`
+
+C++ source validation
+---------------------
+- CMake release build completed successfully in `source/build-4.6`
+- test suite passed: 9 / 9 PASS
+
+Important scope note
+--------------------
+The source project contains Beamcast GX research GPU assets and backend discovery/probing code. In this execution environment there is no usable OpenCL/Vulkan/CUDA/HIP device runtime path available for end-to-end hardware validation, so real GPU execution cannot be claimed as validated here.

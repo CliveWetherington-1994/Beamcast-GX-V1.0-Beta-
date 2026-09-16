@@ -1,0 +1,54 @@
+Beamcast GX 5.0 Giga Research validation
+========================================
+Date: 2026-09-15
+
+Portable Windows renderer / Studio source
+----------------------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows x64 GUI cross-build: PASS
+- Windows x64 CLI cross-build: PASS
+- BeamcastStudio.exe identified as PE32+ Windows GUI x86-64: PASS
+- beamcast-cli.exe identified as PE32+ Windows console x86-64: PASS
+- Embedded OpenCL 1.2 kernel syntax validation with clang: PASS
+
+New 5.0 regression coverage
+---------------------------
+- FXAA/TXAA-style resolve output validity: PASS
+- HBAO/HBAO+ guide-space AO output validity: PASS
+- bloom output validity: PASS
+- HDR tone-map conversion modes: PASS
+- stochastic MSAA/TSAA effective sample accounting: PASS
+- editable preset object creation/picking/translation: PASS
+- PFM HDR output: PASS
+- existing temporal reprojection / denoise / upscale / OBJ / save-format tests: PASS
+
+Canonical C++17 engine
+----------------------
+Release build: 9 / 9 PASS
+-Wall -Wextra -Wpedantic -Werror build: 9 / 9 PASS
+ASan + UBSan:
+  tests 1-6 passed in combined run before command timeout
+  tests 7-9 rerun separately: 3 / 3 PASS
+  no sanitizer diagnostics observed
+
+Application smoke tests
+-----------------------
+Linux x64 C++ Studio X11 smoke launch: PASS
+Linux x64 CLI tiny real render: PASS
+
+Hardware-validation limitation
+------------------------------
+This execution environment does not expose a usable physical OpenCL GPU. The Windows OpenCL dispatcher and device kernel are compiled/syntax-validated, but end-to-end GPU execution and performance must be measured on the destination machine with a usable OpenCL GPU driver/runtime.
+
+No claim of 'best optimization in the world' is made. That would require reproducible benchmarks against established renderers across multiple hardware classes and workloads.
+
+Final clean archive validation
+------------------------------
+- final ZIP extracted to a new directory: PASS
+- portable `go test ./...` from extracted ZIP: PASS
+- Windows GUI cross-build from extracted ZIP: PASS
+- fresh CMake Release configure/build from extracted ZIP: PASS
+- C++ tests from extracted ZIP: 9 / 9 PASS

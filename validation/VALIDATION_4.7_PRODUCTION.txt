@@ -1,0 +1,74 @@
+Beamcast GX 4.7 Production validation
+=====================================
+Date: 2026-09-15
+
+WINDOWS PORTABLE FRONTEND
+-------------------------
+PASS  gofmt
+PASS  go test ./...
+PASS  go test -race ./...
+PASS  GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go vet ./...
+PASS  Windows GUI cross-build
+PASS  Windows CLI cross-build
+PASS  file(1): BeamcastStudio.exe is PE32+ x86-64 Windows GUI executable
+PASS  file(1): beamcast-cli.exe is PE32+ x86-64 Windows console executable
+PASS  Embedded OpenCL 1.2 kernel syntax with clang -x cl -cl-std=CL1.2 -fsyntax-only
+
+PORTABLE REGRESSION COVERAGE
+----------------------------
+PASS  tiny BVH/render test
+PASS  OBJ import test
+PASS  PPM/BMP save/rotation test
+PASS  guide-aware denoising/upscale test
+PASS  temporal reprojection/history reuse test
+
+CANONICAL C++17 ENGINE
+----------------------
+PASS  Release build
+PASS  Release tests: 9 / 9
+PASS  -Werror build
+PASS  -Werror tests: 9 / 9
+PASS  ASan + UBSan build
+PASS  ASan + UBSan tests: 9 / 9
+
+GPU VALIDATION SCOPE
+--------------------
+The Windows executable contains a real runtime-loaded OpenCL GPU path:
+- OpenCL.dll discovery
+- GPU device discovery
+- context/queue/program/kernel creation
+- BVH/primitive/material buffer upload
+- row-chunk kernel dispatch
+- progressive readback
+- ray-count readback
+- CPU fallback on OpenCL failure
+
+This container exposes an OpenCL loader but no usable physical OpenCL platform/device, so the OpenCL backend could
+not be run end-to-end on GPU hardware here. Kernel syntax and Windows compilation were validated instead.
+
+RECONSTRUCTION / DENOISING
+--------------------------
+- primary-hit world-position / normal / depth guides
+- 3-iteration a-trous guide-aware denoiser
+- temporal reprojection into previous camera history
+- normal and world-position rejection
+- neighborhood clamp to reduce ghosting
+- bicubic spatial upscale
+- edge-aware sharpening
+- Ultra Quality / Balanced / Performance internal-resolution presets
+
+VIEWPORT PRESENTATION
+---------------------
+- Win32 double-buffered painting retained
+- render frame serial/versioning added
+- CPU progressive updates throttled to render generations rather than every completed tile
+- transformed/rotated framebuffer cached between paints
+- idle timer invalidates only when a new frame serial or render-state transition exists
+
+FINAL ARTIFACT VALIDATION
+-------------------------
+PASS  Final ZIP extracted into a clean directory
+PASS  Go portable tests from extracted ZIP
+PASS  Fresh CMake/Ninja C++ build from extracted ZIP
+PASS  C++ tests from extracted ZIP: 9 / 9
+NOTE  First packaging attempt correctly failed because a wildcard excluded the required test PPM fixture; packaging rule was fixed and the final ZIP passed.

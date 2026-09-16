@@ -1,0 +1,69 @@
+Beamcast GX 5.8 GPU Dataflow validation
+=======================================
+Date: 2026-09-16
+
+Portable renderer / application
+-------------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows test binary cross-compile: PASS
+- Windows x64 GUI cross-build: PASS
+- Windows x64 CLI cross-build: PASS
+- BeamcastStudio.exe identified as PE32+ Windows GUI x86-64: PASS
+- beamcast-cli.exe identified as PE32+ Windows console x86-64: PASS
+
+GPU dataflow correctness / ABI
+------------------------------
+- OpenCL 1.2 kernel syntax validation with clang: PASS
+- optimized SPIR/LLVM generation: PASS
+- host/device ABI compile-time size checks:
+  clNode: 32 bytes
+  clSphere: 32 bytes
+  clTriangle: 40 bytes
+  clMaterial: 32 bytes
+- threaded BVH escape-index topology test: PASS
+- threaded stackless closest-hit equivalence vs CPU BVH: PASS
+- GIGA benchmark formatting/regression test: PASS
+- GIGA quick benchmark execution: PASS
+
+Offline GPU structural comparison against 5.7
+---------------------------------------------
+- private 32-int traversal stack removed
+- optimized OpenCL IR traversal stack arrays: 5.7 present, 5.8 none
+- optimized SPIR alloca count: 5.7 = 14, 5.8 = 0 in this clang analysis
+- 5.7 source-index order stream replaced by typed BVH leaf references
+- 40-byte node -> 32-byte node
+- 36-byte material -> 32-byte material
+- 68-byte 5.7 sphere candidate stream -> 36-byte 5.8 stream (~47.1% less)
+- 68-byte 5.7 triangle candidate stream -> 44-byte 5.8 stream (~35.3% less)
+- guide payload 16 -> 12 bytes/pixel (25% less)
+- color+guide readback 32 -> 28 bytes/pixel (12.5% less)
+
+Modeled built-in scene device-data reduction
+--------------------------------------------
+Showcase: 640 B -> 436 B (31.9%)
+Cornell: 992 B -> 692 B (30.2%)
+Stress: 76,604 B -> 46,168 B (39.7%)
+
+Canonical C++17 engine
+----------------------
+- Release configure/build with BEAMCAST_BUILD_TESTS=ON: PASS
+- Release tests: 9 / 9 PASS
+- -Wall -Wextra -Wpedantic -Werror build: PASS
+- -Werror tests: 9 / 9 PASS
+
+Hardware limitation
+-------------------
+The build environment does not expose a usable physical OpenCL GPU/device. Therefore no hardware GPU render-time percentage is claimed. Kernel syntax/IR, Windows host code, data layout, cross-builds and traversal correctness are validated here. Actual GPU timing should be measured with Beamcast's integrated GPU/GIGA benchmark on the destination machine.
+
+Clean archive validation
+------------------------
+- candidate ZIP extracted to a fresh directory: PASS
+- portable go test ./... from extracted ZIP: PASS
+- Windows GUI rebuild from extracted ZIP: PASS
+- Windows CLI rebuild from extracted ZIP: PASS
+- OpenCL kernel syntax from extracted ZIP: PASS
+- fresh CMake Release configure/build from extracted ZIP: PASS
+- C++ tests from extracted ZIP: 9 / 9 PASS

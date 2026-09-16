@@ -1,0 +1,42 @@
+Beamcast GX 5.1 HyperTrace Research validation
+==============================================
+Date: 2026-09-15
+
+Portable Windows renderer / Studio source
+----------------------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows x64 GUI cross-build: PASS
+- Windows x64 CLI cross-build: PASS
+- BeamcastStudio.exe identified as PE32+ Windows GUI x86-64: PASS
+- beamcast-cli.exe identified as PE32+ Windows console x86-64: PASS
+
+New 5.1 regression coverage
+---------------------------
+- path tracing integrator render: PASS
+- recursive ray tracing integrator render: PASS
+- photon mapping integrator render: PASS
+- Beauty / Albedo / Normal / Depth / AO / Heat debug image generation: PASS
+- FXAA/TXAA-style resolve output validity: PASS
+- HBAO/HBAO+ guide-space AO output validity: PASS
+- bloom output validity: PASS
+- HDR tone-map conversion modes: PASS
+- stochastic MSAA/TSAA effective sample accounting: PASS
+- editable preset object creation/picking/translation: PASS
+- PFM HDR output: PASS
+- existing temporal reprojection / denoise / upscale / OBJ / save-format tests: PASS
+
+Hardware-validation limitation
+------------------------------
+This execution environment does not expose a usable physical OpenCL GPU. The Windows OpenCL dispatcher and device kernel are compiled and the application cross-builds correctly, but end-to-end GPU execution and performance must be measured on the destination Windows machine with a usable OpenCL GPU driver/runtime.
+
+Scope note
+----------
+No claim of “best optimisation in the world” is made. The 5.1 work adds concrete optimisation controls and research features, not an absolute benchmark claim.
+
+Final clean archive validation
+------------------------------
+- final ZIP extracted to a new directory: PASS
+- portable `go test ./...` from extracted ZIP: PASS

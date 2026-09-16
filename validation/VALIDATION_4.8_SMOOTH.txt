@@ -1,0 +1,29 @@
+Beamcast GX 4.8 Smooth validation
+=================================
+
+Package root: /mnt/data/beamcast_gx_4.8_smooth
+Date: 2026-09-15
+
+Portable Windows frontend validation
+------------------------------------
+- gofmt applied to `windows_portable/*.go`
+- `go test ./...` passed
+- Windows GUI executable built successfully:
+  GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-H=windowsgui -s -w" -o ../bin/windows-x64/BeamcastStudio.exe .
+- Windows CLI executable built successfully:
+  GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -tags beamcast_cli -trimpath -ldflags "-s -w" -o ../bin/windows-x64/beamcast-cli.exe .
+- both outputs identified as PE32+ x64 binaries
+
+4.8 app-level changes
+---------------------
+- added 1440p resolution preset
+- added exposure controls (-1 EV / 0 EV / +1 EV)
+- added gamma controls (2.0 / 2.2 / 2.4)
+- added viewport update-rate controls (15 / 30 / 60 Hz)
+- added camera navigation speed controls (Fine / Normal / Fast)
+- retained smoother presentation path from 4.7
+- added tone mapping controls to the portable renderer output conversion path
+
+Scope note
+----------
+This 4.8 pass focuses on the desktop application / Win32 frontend feel and configurability. The underlying broader project source tree from 4.7 Production is retained, while the main new work in 4.8 is the Windows portable Studio application and its executables.

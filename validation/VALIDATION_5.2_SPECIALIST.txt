@@ -1,0 +1,47 @@
+Beamcast GX 5.2 Specialist Research validation
+===============================================
+Date: 2026-09-15
+
+Portable renderer / Studio
+--------------------------
+- gofmt: PASS
+- go test ./...: PASS
+- go test -race ./...: PASS
+- Windows-target go vet: PASS
+- Windows x64 GUI cross-build: PASS
+- Windows x64 CLI cross-build: PASS
+- GUI identified as PE32+ Windows GUI x86-64: PASS
+- CLI identified as PE32+ Windows console x86-64: PASS
+- embedded OpenCL 1.2 kernel syntax check with clang: PASS
+
+5.2 specialist regression coverage
+----------------------------------
+- Path / recursive / photon integrators: PASS
+- Halton / R2 / random sampler range checks: PASS
+- firefly clamp behavior: PASS
+- power-weighted light-selection PDF normalization: PASS
+- power heuristic sanity: PASS
+- specialist MIS render smoke test: PASS
+- debug view generation: PASS
+- temporal / denoise / upscale / AO / bloom / HDR tests: PASS
+- object editing tests: PASS
+
+Canonical C++17 engine
+----------------------
+Release build: 9 / 9 PASS
+-Wall -Wextra -Wpedantic -Werror build: 9 / 9 PASS
+
+Hardware limitation
+-------------------
+No physical OpenCL GPU is exposed in this environment. The OpenCL loader, dispatcher, executable integration, and kernel syntax are validated, but end-to-end GPU performance must be measured on a destination machine with a working OpenCL GPU runtime.
+
+Specialist transport compatibility
+----------------------------------
+The CPU path implements the new 5.2 MIS / power-light / low-discrepancy / adaptive / firefly-clamp controls. The OpenCL kernel remains the baseline GPU path tracer. The GUI includes a GPU compatibility preset so unsupported specialist settings are not silently treated as implemented on the GPU.
+
+Final clean archive validation
+------------------------------
+- final ZIP extraction to a clean directory: PASS
+- portable `go test ./...` from extracted ZIP: PASS
+- fresh CMake Release configure/build from extracted ZIP: PASS
+- C++ tests from extracted ZIP: 9 / 9 PASS
