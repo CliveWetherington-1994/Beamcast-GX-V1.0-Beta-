@@ -1,6 +1,9 @@
 # Beamcast GX 5.9 Ultra Realism
 
-Beamcast GX 5.9 retains the 5.8 GPU Dataflow renderer, the 5.7 integrated GIGA benchmark, and the 5.6 multicore pipeline, while adding a deliberately high-fidelity **Ultra Realism** render preset and a cleaned-up native Win32 inspector layout.
+Beamcast GX 5.9 V1.0 Beta is a medium weight ray tracing library, and Windows application. 
+
+
+5.9 retains the 5.8 GPU Dataflow renderer, the 5.7 integrated GIGA benchmark, and the 5.6 multicore pipeline, while adding a deliberately high-fidelity **Ultra Realism** render preset and a cleaned-up native Win32 inspector layout.
 
 ## Ultra Realism preset
 
